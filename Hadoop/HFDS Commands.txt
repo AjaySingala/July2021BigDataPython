@@ -58,3 +58,39 @@ hdfs dfs -rm -r <path to folder on hdfs>	# ensure folders are empty
 
 # help	
 hdfs dfs
+
+Hadoop InputFormat:
+	FileInputFormat
+	TextInputFormat
+		each line is a separate record.
+	KeyValueTextInputFormat
+		KV pair
+		key\tvalue
+		For example:
+			name	ajay
+			lastname	singala
+			city	mumbai
+	SequenceFileInputFormat
+		address	1020, Some building name, MG Road, Mumbai, 400067
+		key		value
+	SequenceFileAsTextInputFormat
+		converts the keys and values as text, internally calls tostring()
+	SequenceFileAsBinaryInputFormat
+		converts keys and values into binary objects
+	NLineInputFormat
+		key value pairs
+		key is located at a specific byte offset on the line
+		N = 1
+	DBInputFormat
+		read data from a RDBMS
+		JDBC connector
+		
+Hadoop OutputFormat:
+	TextOutputFormat
+	MapFileOutputFormat
+	SequenceFileOutputFormat
+	SequenceFileAsBinaryOutputFormat
+	DBOutputFormat
+	MultipleOutputs
+	LazyOutputFormat
+		
