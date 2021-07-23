@@ -1,0 +1,60 @@
+hdfs dfs -ls
+hdfs dfs -ls /
+
+# Copy file(s)
+hdfs dfs -copyFromLocal <path to file on local disk> <hdfs path>
+hdfs dfs -copyFromLocal ./files.txt /user/maria_dev
+hdfs dfs -copyFromLocal ./dir1/files.txt /user/maria_dev/data
+hdfs dfs -copyFromLocal ./dir1/files2.txt /tmp/data
+hdfs dfs -copyFromLocal ./dir1/*.py /tmp/pythonfiles
+
+# Alternative to -copyFromLocal
+hdfs dfs -put <path to file on local disk> <hdfs path>
+hdfs dfs -put ./files.txt /user/maria_dev
+hdfs dfs -put ./dir1/files.txt /user/maria_dev/data
+hdfs dfs -put ./dir1/files2.txt /tmp/data
+hdfs dfs -put ./dir1/*.py /tmp/pythonfiles
+
+hdfs dfs -cat /user/maria_dev/files.txt
+hdfs dfs -cat /tmp/files.txt
+
+hdfs dfs -copyToLocal <hdfs path> <path to file on local disk>
+
+hdfs dfs -get <hdfs path> <path to file on local disk>
+hdfs dfs -get /user/maria_dev/mr_output/p*.txt ~/map_reduce/output
+
+hdfs dfs -moveFromLocal <path to file on local disk> <hdfs path> 
+
+# copy within HDFS.
+hdfs dfs -cp <source on hdfs> <target on hdfs>
+hdfs dfs -cp /tmp/data/results.csv /user/maria_dev/data
+
+# copy within HDFS.
+hdfs dfs -mv <source on hdfs> <target on hdfs>
+hdfs dfs -mv /tmp/data/results.csv /user/maria_dev/data
+
+# get size of files in a hdfs folder.
+hdfs dfs -du <hdfs dir name>
+
+# total size of all files/folders in a hdfs folder.
+hdfs dfs -du -s <hdfs dir name>
+
+# last modified date/time
+hdfs dfs -stat <hdfs dir name>
+hdfs dfs -stat <path to file on hdfs>
+
+# Replication factor change.
+hdfs dfs -setrep -w 5 <path to file on hdfs>
+	-w : wait till the replication is completed
+hdfs dfs -setrep -R 5 <path to hdfs folder>
+	- -R : Recursive
+hdfs dfs -setrep -R 5 /user/maria_dev/data
+hdfs dfs -setrep -R -w 5 <path to hdfs folder>
+
+# delete files.
+hdfs dfs -rm -r <path to file on hdfs>
+hdfs dfs -rm -r <path to folder on hdfs>	# ensure folders are empty
+	-r : recursive
+
+# help	
+hdfs dfs

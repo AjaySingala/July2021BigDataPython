@@ -1,0 +1,182 @@
+ls => dir
+hidden start with .
+
+output > target
+>> append
+
+stdin	console
+stdout	console
+
+cat files1.txt > dummyfile.txt
+
+less
+	q - quit
+	ENTER - next line
+	SPACE BAR - next page
+	p - f page
+	
+copy source target
+copy file1.text c:\temp\dumps\file1.txt
+
+ls -a -l -F -R -r -h
+mkdir
+cd
+pwd
+cat
+echo
+cp
+mv
+less
+
+grep <options> <file>
+-i - ignore case
+-c - count lines
+-l - filenames that match the search
+-w - match whole word
+-o - display only the search pattern
+-n - display line nos where match found
+-v - inverse the search filter
+-e - expression (multiple)
+-f - match expression from given file
+-An - display line matching expr and next n lines
+-Bn - display line matching expr and previous n lines
+-Cn - display line matching expr and previous and next n lines
+
+Permissions:
+	bourne shell
+	C shell
+	bash
+	
+	root - SuperUser
+	Groups
+		rwxrwxr--
+		
+	chown: change owner
+		chown [options] USER[:GROUP] FILE(s) 
+		maria_dev maria_dev
+		chown ajays:projectrevature ./projectfolder/*
+		ajays projectrevature
+
+		maria_dev maria_dev
+		chown ajays ./projectfolder/*
+		ajays maria_dev
+		
+		maria_dev maria_dev
+		chown ajays: ./projectfolder/*		# change group to user's "login group"
+		ajays ajays
+
+	chmod: change mode
+		chmod [reference] [operator] [mode] file(s)
+		reference:
+			u	- owner
+			g	- group
+			o	- other
+			a	- all
+		operator:
+			+	- add the specified modes to the specified classes
+			-	- removes the specified mode from the specified classes
+			=	- the modes specified are the exact modes that are set for the specified classes
+		mode:
+			r
+			w
+			x
+		
+		BEFORE: -rw-rw-r-- file1
+		chmod u=r file1
+		AFTER: -r--rw-r-- file1
+		
+		drwxrwxr-x dir1
+		chmod u=rw file1
+		drw-rwx-r-x
+		
+		-rwxrwxr-x file1
+		chmod a-x file1
+		-rw-rw-r--
+		
+		-rwxrwxr-x file1
+		chmod go+x file1
+		-rwxrwxr-x
+		
+		Permissions can also be given using numbers, OCTAL numbers:
+			x: 1
+			w: 2
+			r: 4
+			
+			3 (1+2): x + w
+			6 (2+4): w + r
+			7 (1+2+4): r+w+x
+			
+			chmod 600 file1
+			chmod 700 file1
+			chmod 666 file1
+				-rw-rw-rw-
+			chmod 777 file1
+				-rwxrwxrwx
+			chmod 002 file1
+				--------w-
+			chmod 100 file1
+				---x------
+Shell scripting:
+	#!/bin/bash		=> "shebang" line.
+	
+nano
+vi (vim)
+	2 modes: edit and command
+	switch to command: ESC
+	In command mode:
+		to enter any command, press colon (:) and then enter the command.
+		ESC + :<command>
+		ESC + :q -> Quit vi
+	How to edit:
+		i: insert (at current character position)
+		I: insert at beginning of line.
+		First time save: ESC:w filename<ENTER>
+		save file: ESC:w	-> Write.
+		a: append after current character
+		A: append after EOL (End of Line)
+		ESC:wq	-> Write (Save) and Quit vi.
+		ESC:q!	-> quit without saving
+		ESC:edit filename: open file from within vi.
+		o: insert line below cursor.
+		O: insert line above cursor.
+		s: (replace char under cursor) delete current char under cursor and remain in INSERT mode.
+		S: (replace current line) detele current line and remain in INSERT mode.
+		r: replace char at current cursor position, does not remain in INSERT mode.
+		R: replace line from current cursor position onward, till you switch to command mode (you can enter multiple lines).
+		J: join 2 lines (next line with the current line).
+		u: undo last changes.
+		CTRL+r: REDO.
+		h: left
+		l: right
+		k: up
+		j: down
+		^: move cursor to beginning of current line
+		0: move cursor to beginning of current line
+		$: move cursor to end of current line
+		:0- jump to first line
+		:$- jump to beginning of last line
+		:n- jump to line number "n"
+		w: move to beginning of next word from current cursor position
+		e: move to end of next word from current character position
+		b: move to beginning of previous word from current character position
+		nw, ne, nb: jump "n" words
+		x: delete character at current cursor position
+		X: delete character previous to current cursor position
+		3x: delete 3 chars from current position
+		3X: delete previous 3 chars from current position
+		yy: (yank) copy current line.
+		2yy: yank next 2 lines starting from current line.
+		p: paste copied line after current line
+		dd: delete current line.
+		2dd: delete next 2 lines starting from current line.
+		dw: delete word starting from current cursor position.
+		2dw: delete next 2 words from current cursor position
+		Search:
+			ESC/<search text>
+		search and replace:
+			:s/search/replace/g - search for a word and replace all occurences of the word with given word on the current line.
+			:%s/search/replace/g - search for a word and replace all occurences of the word on all lines with given word.
+				/gc - confirmatipon
+				/gi - ignore case
+			:%s/\<search\>/replace/g - search for whole word and replace all occurances on all lines
+			
