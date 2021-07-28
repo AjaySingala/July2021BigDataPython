@@ -1,0 +1,223 @@
+sudo mysql -u root -p
+Password: hortonworks1
+
+CREATE DATABASE userdb;
+
+SHOW DATABASES;
+
+emp:
+	id
+	name
+	deg
+	salary
+	dept
+emp_add:
+	id
+	hno
+	street
+	city
+emp_contact:
+	id
+	phno
+	email
+	
+USE userdb;
+CREATE TABLE emp (
+	id int NOT NULL AUTO_INCREMENT,
+	name varchar(25) NOT NULL,
+	deg varchar(25),
+	salary decimal(8,2),
+	dept varchar(25),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE emp_add (
+	id int NOT NULL,
+	hno varchar(10),
+	street varchar(50),
+	city varchar(25)
+)
+
+CREATE TABLE emp_contact (
+	id int NOT NULL,
+	phno varchar(15),
+	email varchar(25)
+)
+
+SHOW TABLES;
+
+INSERT INTO emp (name, deg, salary, dept)
+VALUES('john smith', 'manager', 10000.00, 'HR');
+INSERT INTO emp (name, deg, salary, dept)
+VALUES('mary jane', 'Proof reader', 8000.00, 'Creative');
+INSERT INTO emp (name, deg, salary, dept)
+VALUES('joe smith', 'PHP Dev', 9000.00, 'IT');
+
+SELECT * FROM emp;
+
+# Note the ids of the records generated in the emp table.
+
+INSERT INTO emp_add (id, hno, street, city)
+VALUES (1, '123', 'MG Road', 'Mumbai')
+INSERT INTO emp_add (id, hno, street, city)
+VALUES (2, '5/42', 'Road to Nowhere', 'Bengaluru')
+INSERT INTO emp_add (id, hno, street, city)
+VALUES (3, '316', 'Civil Road', 'Chennai')
+
+SELECT * FROM emp_add;
+
+INSERT INTO emp_contact (id, phno, email)
+VALUES (1, '555-888-9999', 'johnsmith@yahoo.com')
+INSERT INTO emp_contact (id, phno, email)
+VALUES (2, '444-888-4321', 'maryjane@yahoo.com')
+INSERT INTO emp_contact (id, phno, email)
+VALUES (3, '666-777-8888', 'joesmith@yahoo.com')
+
+SELECT * FROM emp_contact;
+
+sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp \
+--target-dir import_data \
+--m 1
+
+sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp_add \
+--target-dir import_data_emp_add \
+--m 1
+
+sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp_contact \
+--target-dir import_data_emp_contact \
+--m 1
+
+# Leave out --target-dir. Takes table name as o/p directory.
+sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp \
+--m 1
+
+# Filters.
+sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp_add \
+--m 1 \
+--where "city = 'Mumbai'"
+
+# Import all tables.
+sqoop import-all-tables \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+
+# Incremental import.
+sqoop import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp \
+--target-dir import_data_emp_incr \
+--m 1 \
+--incremental append \
+--check-column id \
+--last-value 1203
+
+# Export data to mysql.
+1201,Ajay,SME,10000.0,IT
+1202,Starlord,Outlaw,12000.0,Guardian
+1203,black widow,spy,12000.0,Avengers
+1204,neo,the one,14000.0,the one
+1205,morpheus,seeker,14000.0,good
+
+sqoop export \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp_export \
+--export-dir export_data \
+--m 1
+
+# Creating and executing Sqoop jobs.
+# Create job.
+sqoop job --create myjob1 \
+-- import \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--table emp_export \
+--target-dir import_data_emp_export \
+--m 1 
+
+sqoop job --list
+sqoop job --show myjob1
+sqoop job --exec myjob1
+
+# Eval.
+sqoop eval \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--query "SELECT * FROM emp_export LIMIT 3"
+
+sqoop eval \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1 \
+--query "INSERT INTO emp VALUES(1206, 'hawkeye', 'shooter', 11000, 'avengers')"
+
+# List tables
+sqoop list-tables \
+--connect jdbc:mysql://localhost/userdb \
+--username root \
+--password hortonworks1
+
+# Import from MySQL directly into Hive using Sqopo.
+# In MySQL:
+create table customer(id int, name varchar(20), age varchar(3), salary integer(10), PRIMARY KEY(id));
+desc customer;
+
+INSERT INTO customer VALUES(1, 'John', 30, 80000 );
+INSERT INTO customer VALUES(2, 'Kevin', 33, 84000 );
+INSERT INTO customer VALUES(3, 'Mark', 28, 90000 );
+INSERT INTO customer VALUES(4, 'Jenna', 34, 93000 );
+INSERT INTO customer VALUES(5, 'Robert', 32,  100000); 
+INSERT INTO customer VALUES(6, 'Zoya', 40, 60000 );
+INSERT INTO customer VALUES(7, 'Sam', 37, 75000 );
+INSERT INTO customer VALUES(8, 'George', 31, 67000); 
+INSERT INTO customer VALUES(9, 'Peter', 23, 70000 );
+INSERT INTO customer VALUES(19, 'Alex', 26, 74000);
+
+# On command line:
+sqoop import \
+--connect jdbc:mysql://localhost/userdb  \
+--username root \
+--password hortonworks1 \
+--columns id,name \
+--split-by id \
+--table customer  \
+--target-dir raw/customers  \
+--fields-terminated-by "," \
+--hive-import \
+--create-hive-table  \
+--hive-table default.customers
+
+sqoop import \
+--connect jdbc:mysql://localhost/userdb  \
+--username root \
+--password hortonworks1 \
+--table customer  \
+--hive-import \
+--hive-database default \
+--m 1
