@@ -1,0 +1,259 @@
+status = null
+if(cond)
+	status = true
+else
+	status = false
+
+Ternary Operator.
+status = (cond) ? true : false
+
+status = "unsassigned"
+if(cond)
+	status = "Completed"
+else
+	status = "Cancelled"
+status = (cond) ? "Completed" : "Cancelled"
+
+if(cond)
+	foo()
+else
+	foobar()
+(cond) ? foo() : foobar()
+
+if (status == "ACTIVE"):
+	do this
+elif (status == "SHIPPED"):
+	do that
+elif (status == "CANCELLED"):
+	do something else
+else:	 # "COMPLETED"
+	do whatever // "COMPLETED"
+	
+switch(status) {
+	case "ACTIVE":
+		do this
+		break;
+	case "SHIPPED":
+		do that
+		break
+	case "CANCELLED":
+		do something else
+		break
+	default:
+		do whatever
+		break
+}
+
+CASE 12 % 2
+	WHEN 0 THEN 'even'
+	WHEN 1 THEN 'odd'
+END
+	 
+CASE Status
+	WHEN "ACTIVE" THEN do this
+	WHEN "SHIPPED" THEN do that
+	WHEN "CANCELLED" THEN do something else
+	ELSE do whatever
+END
+
+LOAD Operator Syntax:
+	relational operator
+	LOAD 'file' [USING FUNCTION] [AS SCHEMA];
+
+
+1,2,3,4
+5,6,7,8
+4,3,2,1
+8,7,6,5
+
+A = LOAD '/Pig_Data/pload.txt' USING PigStorage(',') AS (a1:int, a2:int, a3:int, a4:int);
+DUMP A;
+DESCRIBE A;
+
+DISTNICT Operator:
+1,3,5
+2,1,4
+1,3,5
+1,4,2
+2,1,4
+
+A = LOAD '/Pig_Data/pdistinct.txt' USING PigStorage(',') AS (a1:int, a2:int, a3:int);
+DUMP A;
+DistinctResult = DISTINCT A;
+DUMP DistinctResult;
+STORE DistinctResult INTO '/Pig_Data/DistinctResult.txt' USING PigStorage(',');
+
+A = LOAD '/Pig_Data/pdistinct.txt' USING PigStorage('\t') AS (a1:int, a2:int, a3:int);
+
+
+CONCAT Operator:
+001,Rajiv,Reddy,21,9848022337,Hyderabad,89
+002,siddarth,Battacharya,22,9848022338,Kolkata,78 
+003,Rajesh,Khanna,22,9848022339,Delhi,90 
+004,Preethi,Agarwal,21,9848022330,Pune,93 
+005,Trupthi,Mohanthy,23,9848022336,Bhuwaneshwar,75 
+006,Archana,Mishra,23,9848022335,Chennai,87 
+007,Komal,Nayak,24,9848022334,trivendram,83 
+008,Bharathi,Nambiayar,24,9848022333,Chennai,72
+
+student_details = LOAD '/Pig_Data/student_details.txt' USING PigStorage(',')
+   as (id:int, firstname:chararray, lastname:chararray, age:int, phone:chararray, city:chararray, gpa:int);
+Describe student_details;
+student_name_concat = FOREACH student_details GENERATE CONCAT (firstname, ' ', lastname);
+DUMP student_name_concat;
+STORE student_name_concat INTO '/Pig_Data/concat' USING PigStorage(',');
+
+FILTER Operator: (filtering records)
+
+1,2
+2,8
+4,5
+9,3
+7,8
+
+A = LOAD '/Pig_Data/pfilter.txt' USING PigStorage(',') AS (a1:int, a2:int);
+FilterResult = FILTER A BY a2==8;
+DUMP FilterResult;
+
+FOREACH Operator: (filtering columns)
+1,2,3
+4,5,6
+7,8,9
+
+A = LOAD '/Pig_Data/pforeach.txt' USING PigStorage(',') AS (a1:int, a2:int, a3:int);
+DUMP A;
+fe = FOREACH A GENERATE a1,a2;
+DUMP fe;
+
+GROUP Operator:
+
+Ajay,Singala,1
+John,Smith,2
+Mary,Jane,3
+Joe,Smith,4
+Peter,Jane,5
+Neo,Trinity,6
+
+A = LOAD '/Pig_Data/pgroup.txt' USING PigStorage(',') AS (fname: chararray, lname: chararray, id: int);
+groupByLName = GROUP A BY lname;
+DUMP groupByLName;
+
+LIMIT Operator:
+limitResult = LIMIT A 2;
+DUMP limitResult;
+
+ORDER <relation> BY Operator:
+orderByfname = ORDER A BY fname;
+DUMP orderByfname;
+orderByfnameDesc = ORDER A BY fname DESC;
+DUMP orderByfnameDesc;
+
+SPLIT Operator:
+
+3,2
+1,8
+4,9
+2,6
+1,7
+2,1
+
+splitData = LOAD '/Pig_Data/psplit.txt' USING PigStorage(',') AS (a1:int, a2:int);
+DUMP splitData;
+SPLIT splitData INTO X IF a1 <= 2, Y IF a1 > 2;
+DUMP X;
+DUMP Y;
+
+UNION Operator:
+
+1,2
+3,4
+
+5,6
+7,8
+
+u1 = LOAD '/Pig_Data/punion1.txt' USING PigStorage(',') AS (a1:int, a2:int);
+u2 = LOAD '/Pig_Data/punion2.txt' USING PigStorage(',') AS (a1:int, a2:int);
+DUMP u1;
+DUMP u2;
+unionized = UNION u1, u2;
+DUMP unionized;
+
+u3 = LOAD '/Pig_Data/punion3.txt' USING PigStorage(',') AS (a1:int, a2:int, a3:int);
+DUMP u3;
+unionized3 = UNION u1, u2, u3;
+DUMP unionized3;
+
+EXEC and RUN:
+If you execute using "run", the commands are displayed in the history. "exec" commands are not displayed in the history.
+DUMP is not displayed in the history at all.
+Filename: union_test.pig
+u1 = LOAD '/Pig_Data/punion1.txt' USING PigStorage(',') AS (a1:int, a2:int);
+u2 = LOAD '/Pig_Data/punion2.txt' USING PigStorage(',') AS (a1:int, a2:int);
+DUMP u1;
+DUMP u2;
+
+grunt> exec union_test.pig
+grunt> run union_test.pig
+
+PIG Functions:
+AVG():
+
+ajay,singala,2.4F
+john,smith,2.1F
+mary,jane,1.5F
+ajay,singala,2.2F
+mary,jane,1.9F
+ajay,singala,2.5F
+
+rawdata = LOAD '/Pig_Data/pavg.txt' USING PigStorage(',') AS (a1:chararray, a2:chararray, a3:float);
+DUMP rawdata;
+groupedData = GROUP rawdata BY a1;
+DUMP groupedData;
+averages = FOREACH groupedData GENERATE rawdata.a1, AVG(rawdata.a3);
+DUMP averages;
+
+COUNT():
+counts = FOREACH groupedData GENERATE COUNT(rawdata);
+DUMP counts;
+
+IN():
+student_details = LOAD '/Pig_Data/student_details.txt' USING PigStorage(',')
+   as (id:int, firstname:chararray, lastname:chararray, age:int, phone:chararray, city:chararray, gpa:int);
+DUMP student_details;
+
+result = FILTER student_details BY id IN (2,4);
+DUMP result;
+
+MAX(), MIN():
+max = FOREACH groupedData GENERATE group, MAX(rawdata.a3);
+DUMP max;
+min = FOREACH groupedData GENERATE group, MIN(rawdata.a3);
+DUMP min;
+
+SUM():
+sum = FOREACH groupedData GENERATE group, SUM(rawdata.a3);
+DUMP sum;
+
+SIZE():
+stuSize = FOREACH student_details GENERATE SIZE(firstname);
+DUMP stuSize;
+
+TOKENIZE():
+pigtext = LOAD '/Pig_Data/ptokenize.txt' USING PigStorage(',') AS (a1:chararray);
+DUMP pigtext;
+
+tokens = FOREACH pigtext GENERATE TOKENIZE(a1);
+DUMP tokens;
+
+Input:
+Apache Pig is a high level data flow platform.
+It executes commands using Map Reduce of Hadoop.
+Pgi Latin is the laguage used for scritps in Pig.
+
+Output (of TOKENIZE):
+({(Apache),(Pig),(is),(a),(high),(level),(data),(flow),(platform.)})
+({(It),(executes),(commands),(using),(Map),(Reduce),(of),(Hadoop.)})
+({(Pgi),(Latin),(is),(the),(laguage),(used),(for),(scritps),(in),(Pig.)})
+
+
+
