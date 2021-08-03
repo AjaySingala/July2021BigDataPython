@@ -1,0 +1,10 @@
+1. Load the data from SalesJan2009.csv into a relation.
+2. Group the data by Country in a relation.
+3. For each tuple in group created in step 2, generate the resulting string of the form-> Name of Country: No. of products sold.
+	For e.g.; 
+		India: 2
+		China: 3
+		etc.
+4. Store the results of step 3 in the directory named '/user/maria_dev/salesData' on HDFS
+
+
