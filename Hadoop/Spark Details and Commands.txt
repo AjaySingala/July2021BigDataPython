@@ -1,0 +1,110 @@
+Apache Spark:
+#1 Big Data Tool
+It's "Hadoop Killer"
+Spark can process data from HDFS, AWS S3, Databases, Messaging Systems (queues, Kafka etc.)
+100TB data.
+	3 times faster than MR.
+Uses in-memory cluster computing.
+MapReduce
+Streaming
+Features:
+	Speed: 10 times faster than running on a disk (in-memory). Reduces the number of read/write operations to disk.
+	Supports multiple languages: base is Java. Built-in APIs are in Java, Scala, Python (PySpark).
+	Advanced Analytics: supports much more than MapReduce. SQL queries, Streaming of data, ML, Graph Algorithms.
+Spark Components:
+	Apache Spark Core: underlying execution engine of Spark platform. all other components are built on top of Core. Provides in-memory computing capabilities, ability to reference external data (dbs, AWS S3, Streaming services).
+	SparkSQL: sits on top of Core. Abstraction (aka SchemaRDD) over the data, supports structured and un-structured data. Provides a SQL language, Dataframes and DataSets.
+	Spark Streaming: Leverages the Core / functionalities to schedule and process streaming analytics. Read/Write data in batches, in queues. Perform transformations of the data into RDDs (Resilient Distributed DataSets) and do further processing.
+	Spark ML: Distributed ML framework. Devs use MLlib and implement various ML algos. (Hadoop also has an MLlib "Mahout")
+	Spark GraphX: distributed Graph-processing framework. Graph computation. (more towards AI, analytics etc.)
+
+Spark itself is written in Scala.
+
+RDDs:
+	Resilient Distributed DataSets.
+	Fundamental data structure of Spark.
+	Immutable distributed collection of objects.
+	any data read (from a file, stream, db) => DataSet
+	DataSet in an RDD -> divided into logical partitions, are processed / computed on different nodes  on the cluster.
+	RDDs can contain objects of types in Python, Java, Scala (including user-defined classes).
+	RDDs are Readonly.
+	A Readonly, Partitioned collection of records.
+	A Fault-tolerant collection of elements/records that can be operated/computed in parallel.
+	
+	Two ways in which you can create RDDs:
+		1. Parallelize existing collection of data, apply transformations (map, filter, reducer, joins...) on existing RDDs.
+		2. Reference a dataset in an external storage system (shared file system, HDFS, Hive, HBase, any data source offer Hadoop Inpotu Format).
+		
+Data Sharing in Map Reduce:
+	Slow.
+	Iterative and Interactive applications.
+		require faster data sharing across all paralle jobs.
+		Since MR does replication, serialization, disk IO, MR is slow!!!
+		Hadoop, most of the tools/frameworks spend ~90% of time doing HDFS read/write operations.
+		
+Shared Variables:
+	Variables that are shared over/between different nodes
+	Broadcast variables: used to cache values in memory of nodes (for e.g.; commonly used values).
+	Accumulators: used to add values (counters, sums, average).
+
+Core Programming:
+	Spark Shell:
+		1. Scala
+		2. Python (PySpark Shell)
+	Python/Scala/Java programs
+	Start a shell:
+		spark-shell
+
+current user: maria_dev
+HDFS home dir: /user/maria_dev
+
+hdfs dfs -ls .
+hdfs dfs -mkdir tmp		=> /user/maria_dev/tmp
+hdfs dfs -mkdir /tmp	=> /tmp
+hdfs dfs -mkdir /etc/dumps/abcd		=> /etc/dumps/abcd
+hdfs dfs -mkdir etc/dumps/abcd		=> /user/maria_dev/etc/dumps/abcd
+
+
+For HDFS:
+val inputfile = sc.textFile("input.txt")
+For local file:		
+val inputfile = sc.textFile("file:///home/maria_dev/SparkSampes/input.txt")
+
+
+val counts = inputfile.flatMap(line => line.split(" ")).map(word => (word, 1)).reduceByKey(_+_);
+counts.toDebugString
+counts.cache()
+counts.saveAsTextFile("tmp/outputdir")							=> HDFS /user/maria_dev/tmp/outputdir
+counts.saveAsTextFile("file:///home/maria_dev/tmp/outputdir")	=> Local file system.
+counts.unpersist()
+
+Numeric RDD ops:
+count()
+Mean()
+sum(0
+Max()
+Min()
+Variance()
+Stdev()
+
+RDD Transformations:
+	Spark Transformation is a function that will generate a new RDD from an existing RDD.
+	RDD Operator Graph / RDD Dependency Graph -> Logical Execution Plan.
+	Directed Acyclic Graph (DAG) of the all RDDs (all parent RDDs of an RDD)
+	Lazy in nature:, i.e.; they get executed only when you call an "action".
+		not executed immediately.
+	very common actions:
+		map()
+		reduceByKey()
+		filter()
+	Resulting RDD is usually different from the original RDD.
+		smaller transformations: filter, count, distinct
+		bigger transformations: flatMap(), union()
+		same: map()
+		
+	Narrow Transformations:
+		all the elements that are required to process / compute the data, they all exist on a single partition (together) of the parent RDD.
+		e.g.; map() filter()
+	Wide Transformations:
+		all the elements that are required to proicess / compute the data, may live on many partitions of the parent RDD.
+		
