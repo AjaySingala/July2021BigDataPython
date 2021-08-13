@@ -143,3 +143,59 @@ Spark Caching:
 			less frequently used data is removed from cache by Spark.
 		
 		
+Infrastructure-As-A-Service: IaaS Examples And Definitions (Iaas)
+Definition: IaaS is the utilization of APIs to manage the lowest levels of network infrastructure, including networking, storage, servers, and virtualization. 
+
+Examples: Rackspace, Digital Ocean, Google Compute Engine, and some deployments of Microsoft Azure and Amazon Web Services (AWS)
+
+Compute Services: AWS EC2, Azure Compute, Google Compute Engine
+
+Common Use Cases: IaaS is the most flexible service model for cloud computing, so it is especially effective for startups and organizations looking for agile scaling. It is also preferred by businesses that seek greater control over their resources.
+
+Platform-As-A-Service: PaaS Examples And Definitions (Paas)
+Definition: PaaS offers an even greater abstraction of cloud service, offering users the capability to build or deploy applications using tools (i.e. programming languages, libraries, services) without maintaining the underlying infrastructure. Users instead have control over the applications themselves. 
+
+Examples: Salesforce, AWS Elastic Beanstalk, Heroku, Google App Engine (GAE), and OpenShift
+
+Common Use Cases: PaaS is highly available and highly scalable, and it gives organizations the ability to build and create new services and solutions without the need for highly skilled developers focused on software maintenance. PaaS is preferred by IT in hybrid cloud environments. 
+
+Software-As-A-Service: SaaS Examples And Definitions (Saas)
+Definition: SaaS enables users to use and access the cloud provider’s applications that are running on the provider’s infrastructure from thin client or program interfaces. 
+
+Examples: There are loads: Google G-Suite, Dropbox, Cisco Webex, Concur, Microsoft O365, Genesys, PayPal
+
+Common Use Cases: SaaS is a comfortable service model for applications that are highly interoperable – used by multiple users internally and externally – and for short-term projects. SaaS models are preferred by
+ small and medium-sized businesses that do not wish to invest heavily in IT maintenance. 
+
+IaaS
+PaaS
+SaaS
+DBaaS
+IaaS
+
+ 
+What is EC2? Elastic Compute Cloud
+What is S3? Simple Storage Service
+EMR Launch modes:
+	Cluster
+	step execution
+
+It is possible to launch an EMR cluster using micro size instances?: No
+
+It is possible to launch a cluster of just Worker Nodes in EMR?: No
+
+It is possible to launch a single node cluster in EMR: Yes
+
+What is the SSH command syntax use to connect to an EMR cluster?
+	ssh -i privateKeyPath.pem hadoop@emr-dns
+
+You can copy files from local to the EMR node and vice versa:
+	SCP client (Secure Copy Protocol)
+	
+	copy from local to cluster:
+		scp -i <path of .pem> <local path> <username@dns:target_path>
+		scp -i C:\myemr\mykey.pem myfile.txt hadoop@ec2-3-108-3-46.ap-south-1.compute.amazonaws.com:/home/maria_dev/samples
+		
+	copy from cluster to local:
+		scp -i <path of .pem> <username@dns:target_path> <local path> 
+		scp -i C:\myemr\mykey.pem hadoop@ec2-3-108-3-46.ap-south-1.compute.amazonaws.com:/home/maria_dev/samples/myfile.txt myfile.txt 
