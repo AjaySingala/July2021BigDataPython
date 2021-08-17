@@ -1,0 +1,210 @@
+What is Spark?
+RDD?
+
+rdd = sc.parallelize([1,2,3,4,5,6,7,8,9])
+
+import pyspark
+from pyspark.sql import SparkSession
+
+spark = SparkSession.appName("My first app").getOrCreate()
+sc = spark.sparkContext
+
+rdd = sc.parallelize([1,2,3,4,5])
+rddData = rdd.collect()
+
+print("No. of Partitions in RDD:", rdd.getNumPartitions())
+print("First element:", rdd.first())
+print(rddData)
+
+
+# Create RDD with 6 partitions.
+rdd = sc.parallelize([1,2,3,4,5], 6)
+
+emptyRDD = sc.parallelize([])
+print("Is RDD empty?:", emptyRDD.isEmpty())
+
+PySpark DataFrames & Pyspark SQL:
+DataSet
+	distributed collection of data.
+	a new interface that has been added from Spark 1.6+
+	it gives more added benefits over RDDs with benefits of SPark SQL's optimized execution engine.
+		strongly typed
+		lambda functions
+	can be constructed from JVM objects, perform transformations on that (map, flatMap, filter etc...)
+	DataSet API is available only for Scala & Java. It is not available for Python!!!
+	
+DataFrames (DF)
+	DF are a kind of DataSet, but organized into named columns.
+	Very similar to tables in a RDBMs.
+	But it has a lot of optimization internally.
+	DFs can be constructed from various sources:
+		data files (structured)
+		Hive tables
+		RDDs (existing)
+		external DBs
+		TXT, CSV, JSON, Avro, Parquet, XML (could be from HDFS, S3, Azure Blob storage/filesystem)
+	DF APIs are available in Java, Scala, Python and R
+	DF is an alias of DataSet[row]
+	
+	
+Creating a DF:
+
+spark = SparkSession.appName("first df").getOrCreate()
+sc = spark.sparkContext
+
+data = [("Java", "200000"), ("Python", "100000"), ("Scala", "30000")]
+columns = ["language", "users_count"]
+
+rdd = sc.parallelize(data)
+
+dfFromRDD = rdd.toDF()
+dfFromRDD.printSchema()
+
+dfFromRDD2 = rdd.toDF(columns)
+dfFromRDD2.printSchema()
+
+Customers: 25 columns
+Id, Firstname, Lastname, City
+SELECT Id, Firstname, Lastname, City
+FROM Customers
+
+
+Create View CustomerView
+AS
+	SELECT Id, Firstname, Lastname, City
+	FROM Customers
+
+
+SELECT * FROM CustomerView
+
+Customers
+Orders
+Order_Details
+Products
+
+Create View OrderInformation
+AS
+	SELECT customerinfo, orderinfo, order_details_info, product_info
+	FROM Customers
+	INNER JOIN Orders ON ....
+	INNER JOIN Order_Detailss ON ....
+	INNER JOIN Products ON ....
+
+SELECT * FROM OrderInformationView
+WHERE Customercity = 'Indore'
+GROUP BY
+ORDER BY
+
+spark = SparkSession.builder.appName("...").getOrCreate()
+
+df = spark.read.text("people.txt")
+df = spark.read.json("people.json")
+df = spark.read.csv("people.csv")
+
+Avro, Parquet, Streaming data from Kafka (next week)
+ORC - Hive files
+
+Different ways to create empty RDDs:
+emptyRDD = sc.parallelize([])
+emptyRDD = spark.sparkContext.parallelize([])
+emptyRDD = spark.sparkContext.emptyRDD()
+
+schema = StructType([
+	StructField("firstname", StringType(), True),
+	StructField("middlename", StringType(), True),
+	StructField("lastname", StringType(), True),
+])
+
+# Create an empty DF from an empty RDD.
+# Approach #1
+df1 = spark.createDataFrame(emptyRDD)
+df1 = spark.createDataFrame(emptyRDD, schema)
+df1.printSchema()
+
+# Approach #2
+df2 = emptyRDD.toDF()
+df2 = emptyRDD.toDF(schema)
+
+# Approach #3
+df3 = spark.createDataFrame([], schema)
+
+# Approach #4
+df4 = spark.createDataFrame([], StructType([]))
+
+# Show contents
+df.show()
+df.show(truncate=True)	# Default.
+df.show(truncate=False)	
+deptDF1.show(truncate=10)
+deptDF1.show(truncate=False, n=2)
+deptDF1.show(vertical=False)	# Default.
+deptDF1.show(vertical=True)
+
+
+# StructType_StructField variations.
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType,ArrayType,MapType
+from pyspark.sql.functions import col,struct,when
+
+spark = SparkSession.builder.master("local[1]") \
+                    .appName('SparkByExamples.com') \
+                    .getOrCreate()
+
+data = [("James","","Smith","36636","M",3000),
+    ("Michael","Rose","","40288","M",4000),
+    ("Robert","","Williams","42114","M",4000),
+    ("Maria","Anne","Jones","39192","F",4000),
+    ("Jen","Mary","Brown","","F",-1)
+  ]
+
+schema = StructType([ 
+    StructField("firstname",StringType(),True), 
+    StructField("middlename",StringType(),True), 
+    StructField("lastname",StringType(),True), 
+    StructField("id", StringType(), True), 
+    StructField("gender", StringType(), True), 
+    StructField("salary", IntegerType(), True) 
+  ])
+ 
+df = spark.createDataFrame(data=data,schema=schema)
+print("Regular schema...")
+df.printSchema()
+df.show(truncate=False)
+
+# Complex object.
+structureData = [
+    (("James","","Smith"),"36636","M",3100),
+    (("Michael","Rose",""),"40288","M",4300),
+    (("Robert","","Williams"),"42114","M",1400),
+    (("Maria","Anne","Jones"),"39192","F",5500),
+    (("Jen","Mary","Brown"),"","F",-1)
+  ]
+structureSchema = StructType([
+        StructField('name', StructType([
+             StructField('firstname', StringType(), True),
+             StructField('middlename', StringType(), True),
+             StructField('lastname', StringType(), True)
+             ])),
+         StructField('id', StringType(), True),
+         StructField('gender', StringType(), True),
+         StructField('salary', IntegerType(), True)
+         ])
+
+df2 = spark.createDataFrame(data=structureData,schema=structureSchema)
+print("Complex schema...")
+df2.printSchema()
+df2.show(truncate=False)
+
+
+updatedDF = df2.withColumn("OtherInfo", 
+    struct(col("id").alias("identifier"),
+    col("gender").alias("gender"),
+    col("salary").alias("salary"),
+    when(col("salary").cast(IntegerType()) < 2000,"Low")
+      .when(col("salary").cast(IntegerType()) < 4000,"Medium")
+      .otherwise("High").alias("Salary_Grade")
+  )).drop("id","gender","salary")
+
+updatedDF.printSchema()
+updatedDF.show(truncate=False)
