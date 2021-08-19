@@ -613,3 +613,182 @@ df4.drop("CopiedColumn") \
 print("Drop the column 'CopiedColumn from df4...")
 df4.printSchema()
 df4.show()
+
+# collect()
+	action => used to retrieve all elements from a given dataset.
+	retrieve all the elements from ALL the nodes to the driver (main) node.
+	always apply collect() on either a filter(), group() etc. (filtered data).
+	
+	vs select() => select() is a transformation function.
+		specify columns - select("fname, lastname")
+
+# withColumn and withColumnRenamed => transformations.
+	withColumnRenamed(existingName, newName)
+		dfNew = df.withColumnRenamed("dob", "DateOfBirth")
+		dfNew.printSchema()
+	
+		df.withColumnRenamed("dob", "DateOfBirth").withColumnRenamed("sex", "Gender")
+		
+		Created a DF with StringType & StructField.
+		df.select(col("gender").alias("sex"),
+			col("name.fname").alias("firstname")
+
+	using toDF() to rename columns.
+		currentColumns = ["fname", "lname", "sex", "dob"]
+		df = spark.createDataFrame(data, currentColumns)
+		df.printSchema()
+		
+		newColumns = ["firstname", "lastname", "gender", "dateOfBirth"]
+		dfNew = df.toDF(*newColumns)
+		dfNew.printSchema()
+		
+# filter()
+	df.filter("gender != 'M'").show() 
+	df.filter("gender <> 'M'").show() 
+	
+	states = ["OH", "NY"]
+	df.filter(df.state.isin(states)).show()
+	
+	# NOT IS IN.
+	df.filter(df.state.isin(states) == False).show()
+	df.filter(~df.state.isin(states)).show()
+
+	df.filter(df.name.firstname.contains("Tom")).show()
+	df.filter(df.name.firstname.like("Tom%")).show()
+	
+	
+inner join
+outer join (full outer join)
+left (outer) join
+right (outer) join
+leftsemi: display columns from left table for matching records only and ignore columns from right table.
+leftanti: display columns from left table for non-matching records only and ignore columns from right table.
+self-join
+
+map():
+	only with RDD.
+	DF do not have map().
+		extract the RDD from the DF and then map() on the RDD.
+		df.rdd.map()
+
+map() vs flatMap():
+	map :It returns a new RDD by applying a function to each element of the RDD.   Function in map can return only one item.
+
+	flatMap: Similar to map, it returns a new RDD by applying  a function to each element of the RDD, but output is flattened.
+	Also, function in flatMap can return a list of elements (0 or more)
+
+	E.g.1:
+	sc.parallelize([3,4,5]).map(lambda x: range(1,x)).collect()
+	Output:
+	[[1, 2], [1, 2, 3], [1, 2, 3, 4]]
+
+	sc.parallelize([3,4,5]).flatMap(lambda x: range(1,x)).collect()
+	Output:  notice o/p is flattened out in a single list
+	[1, 2, 1, 2, 3, 1, 2, 3, 4] 
+
+	E.g.2:
+	Good Morning
+	Good Evening
+	Good Day
+	Happy Birthday
+	Happy New Year
+
+	lines = sc.textFile("greetings.txt")
+	lines.map(lambda line: line.split()).collect()
+	Output:-
+	[['Good', 'Morning'], ['Good', 'Evening'], ['Good', 'Day'], ['Happy', 'Birthday'], ['Happy', 'New', 'Year']]
+
+	lines.flatMap(lambda line: line.split()).collect()
+	Output:-
+	['Good', 'Morning', 'Good', 'Evening', 'Good', 'Day', 'Happy', 'Birthday', 'Happy', 'New', 'Year']
+
+parquet file format:
+	PySpark SQL ()s to read/write DFs into Partquet files.
+	parquet()
+	DataFrameReader / DataFrameWriter
+	Maintains the schema along with the data in the parquet file.
+	To process structured file.
+	
+	df.write.parquet("tmp/output/employees/emp.parquet")
+	empDF = spark.read.parquet(tmp/output/employees/emp.parquet")
+	
+	Is a columnar storage format.
+	It is available to any framework on Hadoop.
+	
+	Advantages:
+		since it is in columnar format, it skips irrelevant data very quickly, query execution is very fast. aggregations are faster.
+		supports nested data structures.
+		has efficient compression and encoding capabilities.
+		Automatically captures the schema of the data (DF).
+		reduces storage by almost 75% on average.
+		Pyspark supports parquet OOTB, no specific dependency on libraries.
+
+5 levels of logging:
+	debug		0
+	info		1
+	warning		2
+	error		3
+	critical	4
+
+#pyspark.parquet.py
+import pyspark
+from pyspark.sql import SparkSession
+
+spark=SparkSession.builder.appName("parquetFile").getOrCreate()
+spark.sparkContext.setLogLevel("ERROR")                 # Default is INFO.
+data =[("James ","","Smith","36636","M",3000),
+        ("Michael ","Rose","","40288","M",4000),
+        ("Robert ","","Williams","42114","M",4000),
+        ("Maria ","Anne","Jones","39192","F",4000),
+        ("Jen","Mary","Brown","","F",-1)]
+columns=["firstname","middlename","lastname","dob","gender","salary"]
+
+print("Creating Data Frame...")
+df=spark.createDataFrame(data,columns)
+df.show()
+
+# Write to a Parquet file to HDFS.
+df.write.parquet("/tmp/output/people.parquet")
+
+# Write to local folder.
+print("Writing...")
+df.write.parquet("file:///home/hdoop/tmp/output/people.parquet")
+
+# Read from a Parquet file.
+print("Reading...")
+parDF=spark.read.parquet("/tmp/output/people.parquet")
+parDF.show()
+
+# Append or overwrite a Parquet file.
+print("Appending...")
+df.write.mode('append').parquet("/tmp/output/people.parquet")
+print("Overwriting...")
+df.write.mode('overwrite').parquet("/tmp/output/people.parquet")
+
+# Create temporary views on parquet files for executing sql queries.
+print("Creating temporary view...")
+parDF.createOrReplaceTempView("ParquetTable")
+parkSQL = spark.sql("select * from ParquetTable where salary >= 4000 ")
+parkSQL.show()
+
+# Creating a table on Parquet file.
+print("Create and show table on Parquet file...")
+spark.sql("CREATE TEMPORARY VIEW PERSON USING parquet OPTIONS (path \"/tmp/output/people.parquet\")")
+spark.sql("SELECT * FROM PERSON").show()
+
+# Create Parquet partition file.
+print("Creating Parquet partition file...")
+df.write.partitionBy("gender","salary").mode("overwrite").parquet("/tmp/output/people2.parquet")
+
+# Retrieving from a partitioned Parquet file
+print("Retrieving from a partitioned Parquet file...")
+parDF2=spark.read.parquet("/tmp/output/people2.parquet/gender=M")
+parDF2.show(truncate=False)
+
+# Creating a table on Partitioned Parquet file.
+print("Creating a table on Partitioned Parquet file...")
+spark.sql("CREATE TEMPORARY VIEW PERSON2 USING parquet OPTIONS (path \"/tmp/output/people2.parquet/gender=F\")")
+spark.sql("SELECT * FROM PERSON2" ).show()
+
+	
+		
