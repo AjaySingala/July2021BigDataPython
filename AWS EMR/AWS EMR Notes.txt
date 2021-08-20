@@ -199,3 +199,10 @@ You can copy files from local to the EMR node and vice versa:
 	copy from cluster to local:
 		scp -i <path of .pem> <username@dns:target_path> <local path> 
 		scp -i C:\myemr\mykey.pem hadoop@ec2-3-108-3-46.ap-south-1.compute.amazonaws.com:/home/maria_dev/samples/myfile.txt myfile.txt 
+
+On Horytonworks VM:
+Transfer file from local machine to sandbox:
+	scp -P 2222 <local_directory_file> root@sandbox-hdp.hortonworks.com:<sandbox_directory_file>
+Transfer file from sandbox to local machine:
+	scp -P 2222 root@sandbox-hdp.hortonworks.com:<sandbox_directory_file> <local_directory_file>
+
