@@ -790,5 +790,24 @@ print("Creating a table on Partitioned Parquet file...")
 spark.sql("CREATE TEMPORARY VIEW PERSON2 USING parquet OPTIONS (path \"/tmp/output/people2.parquet/gender=F\")")
 spark.sql("SELECT * FROM PERSON2" ).show()
 
+# SparkSession:	entry point.
+spark = SparkSession.builder \
+    .master("spark://mycluster.acme.org[4]") \
+    .appName("ajaysingala.com") \
+    .getOrCreate()
 	
-		
+	Explain:
+		.master():
+			.master("local")
+			.master("local[n]")
+			.master("local[*]")
+			.master("spark://url:port")	# standalone spart cluster.
+			.mesos("mesos://url:port")
+			.master("yarn")
+				determine the location of the cluster from the HADOOP_CONF_DIR / YARN_CONF_DIR
+			.master("yarn-client")		# --deploy-mode client
+			.master("yarn-cluster")		# --deploy-mode cluster
+			
+		.config():
+			.config("key", "value")
+			.config("spark.executor.memory", "512m")
