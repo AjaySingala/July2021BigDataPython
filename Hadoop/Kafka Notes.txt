@@ -1,0 +1,374 @@
+Apache Kafka:
+Streaming:
+	Real time data flow.
+	InstaLive, FBLive, NetFlix, HotStar Disney+, Amazon Prime, other music services etc....
+Event Streaming:
+	Real time data flow.
+	Data sent by data sources: DB, device, application, sensor, cloud service, IoT
+	When they send the data, event streaming
+	events are then stored somewhere for later retrieval.
+		queues, db etc.
+	after retrieval, it can be manipulated, processed, respond / react to the event.
+		reacting can also be event streaming.
+	continuous flow of data to ensure that the right data is at the right place, at the right time.
+	Uses of Event Streaming:
+		stock market
+		weather
+		news feeds
+		Tweets
+		tracking of vehicles - trucks, cars, fleet, shipment, planes
+			sensitive "package" transportation
+		sensors in vehicles or manufacturing units
+		sensors in nuclear plants
+		devices (IoT)
+		log files (moinitoring of applications, servers)
+Kafka:
+	is an event streaming platform.
+	distributed streaming platform.
+	3 key capabilities:
+		1. To Publish (write) and Subscribe (read) streams of events, for e.g.; import/export of data to/from other systems.
+		2. To store stream of events durably and reliably as long as you want.
+		3. To process streams of events as and when they occur or retrospectively.
+		
+	All of this is distributed, highly scalable, fault-tolerant, elastic and secure manner.
+	Install it on a PC, VM, containers (microservices - docker and kubernetes) - cloud or on-premise.
+	Is a distributed system of serves and clients that communicate over a high-performance TCP network protocol.
+	Servers:
+		cluster of one or more servers. Can be on multiple data centers or cloud regions.
+		some of these servers form the storage layer aka "Brokers".
+		other servers run "Kafka Connect" - continuously import/export the data as event streams.
+			used to integrate with applications/systems - DBs, applications or other Kafka clusters.
+	Clients:
+		write distributed applications (mostly microservices-based) that read, write, process the event stream.
+		Parallely, at scale, fault-tolerant.
+		Using Java, Scala, Python, Go, C/C++ etc.
+		Kafka Stream Libraries - APIs
+		
+Key concepts and terminologies:
+	Event:
+		It records the fact that "something happened" somewhere.
+		It is called a record or message.
+		To read / write data to Kafka, do it in the form of "events".
+		It is a "key", a "value", has a "timestamp" and some optional "metadata" headers.
+		For e.g.;
+			Event key: "Ajay Singala".
+			Event value: "I withdrew Rs.10,000 from bank account".
+			Event timestamp: "Aug 24, 2021 10:45"
+	Producers (P) & Consumers (C):
+		Producers (aka Publishers): are client applications that publish (write) events to Kafka.
+		Consumers (aka Subscribers): are client applications that subscribe (read) to the events from Kafka.
+		P&C are completely decoupled & agnostic of each other.
+			This a key element to achieve High Scalability in Kafka.
+			Producer does not have to wait for a Subscriber to read/process the event.
+			Kafka provides a guarantee every event will be exists (processed) exactly once!
+	Topics:
+		Events in Kafka are organized and stored (durably) in Topics.
+		In simple terms, 
+			a Topic is like a folder (directory) in a file system.
+			an Event is like a file that is stored in the folder (Topic).
+		Are always multi-producer and multi-subscriber.
+		May have zero or more Producers that send messages (events) to the topic.
+		May have zero or more Consumers that read messages (events) from the topic.
+		May have zero or more messages (events) in the Topic.
+		Topics are partitioned - spread across number of "buckets" located on different Kafka brokers.
+			Important from a scalability perspective.
+			Allows clients to read / write to/from brokers parallelly.
+		When an event with the same "event key" is written to a Topic, are written to the same partition.
+			e.g.; customerId, vehicleId, machineId etc.
+		Kafka guarantees that any consumer reading a specific topic will read events in that partition in exactly the same order that they were written.
+	
+Kafka APIs:
+	Admin API:
+		manage and inspect Topics, brokers and other Kafka objects.
+	Producer API:
+		to publish (write) event streams to one or more topics.
+	Consumer API:
+		to subscribe (read) to one or more Topics and then process the stream.
+	Kafka Streams API:
+		to implement stream processing apps or microservices.
+		provides high-level functions to process event streams
+			transformations, stateful operations (aggregations, joins), time-based processing (event-time) etc.
+		reads from 1+ Topics, generates output, which could be an event stream for other 1+ Topics.
+			Transforms an input stream to output stream.
+	Kafka Connect API:
+		to build and run reusable data import/export connectors, which consume / produce event streams from and to externa; applications or DBs or systems to easily integrate with Kafka.
+		For e.g.; a connector to MySQL or PostgreSQL.
+		Hundreds of ready-to-use connectors are available for Kafka to use.
+		
+Kafka Core Capabilities:
+	High Throughput: Deliver messages using a cluster (of machines) even on low latencies.
+	Scalable: churn up '000s of brokers, manage trillions of messages per day, petabytes of data, 00s of partitions.
+		Elasticity: to expand and contract storage and processing.
+	Permanent Storage: Event stream data is stored safely in a distributed, durable, fault-tolerant cluster.
+	High Availability: Clusters are efficiently available across data centers, regions, geographic regions.
+
+Kafka Ecosystem:
+	Built-in Stream Processing:
+		joins, aggregations, transformations, filters.
+	Connect to anything:
+		Connect APIs (interfaces) to hundreds of event sources DBs, ElastiSearch, S3 etc.
+	Client Libraries:
+		read, write, process event streams using a programming language of choice.
+	Open Source tools:
+		community driven tools.
+	
+Design Goals:
+	Scalaiblity
+	High-volume
+	Data Transformations
+	Low Latency
+	Fault Tolerant
+	Reliability - Partitions - distributed, replicated and fault-tolerant.
+	Durability - even after processing is done, data can exist.
+	Performance - due to high throughput for publishing and subscribing messages. Manage terabytes of data.
+
+export KAFKA_HOME="/usr/hdp/current/kafka-broker"
+echo $KAFKA_HOME
+	/usr/hdp/current/kafka-broker
+
+vi .bashrc
+export KAFKA_HOME="/usr/hdp/current/kafka-broker"
+source .bashrc
+ 
+Start services (NOT ON Hortonworks):
+	$KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_HOME/config/zookeeper.properties
+	$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties
+	
+Creating a Topic:
+	$KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic sampleTopic --replication-factor 1 --partitions 1
+Describe a Topic:	
+	$KAFKA_HOME/bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic sampleTopic
+List Topics:	
+	$KAFKA_HOME/bin/kafka-topics.sh --list --zookeeper localhost:2181
+	$KAFKA_HOME/bin/kafka-topics.sh --list --zookeeper sandbox-hdp.hortonworks.com:2181
+Producer:
+	Default:
+	$KAFKA_HOME/bin/kafka-console-producer.sh --topic sampleTopic --broker-list sandbox-hdp.hortonworks.com:9092
+	Hortonworks:
+	$KAFKA_HOME/bin/kafka-console-producer.sh --topic sampleTopic --broker-list sandbox-hdp.hortonworks.com:6667
+Consumer:
+	$KAFKA_HOME/bin/kafka-console-consumer.sh --topic sampleTopic --bootstrap-server sandbox-hdp.hortonworks.com:6667 --from-beginning
+	
+
+$KAFKA_HOME/bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic connect-test
+$KAFKA_HOME/bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic connect-test1
+
+$KAFKA_HOME/bin/zkCli.sh -server localhost:2181
+
+File Connector:
+	file-sink, file-source
+	
+	T1:
+	# config file settings.
+	connect-standalone.properties
+	connect-file-sink.properties
+	connect-file-source.properties
+	
+	
+	Terminal #1:
+	$ cd $KAFKA_HOME
+	$ cp conf/connect-standalone.properties ~
+	$ cp conf/connect-file-sink.properties ~
+	$ cp conf/connect-file-source.properties ~
+
+	$ cd ~
+	$ cat > logfile.txt
+	Hello there!
+	Welcome to Kafka.
+	Testing this file for File Sink and Source Connector
+	(CTRL+C)
+	$ cat logfile.txt
+
+	•	In ~/connect-standalone.properties, change the bootstrap-server property value to sandbox-hdp.hortonworks.com:6667
+	•	In ~/connect-file-sink.properties, change the file property value to /home/maria_dev/test.sink.txt
+	•	In ~/connect-file-source.properties, change the file property value to /home/maria_dev/logfile.txt
+	
+	Terminal #2:
+	$ $KAFKA_HOME/bin/kafka-console-consumer.sh --bootstrap-server sandbox-hdp.hortonworks.com:6667 --topic connect-test
+	
+	Terminal #1:
+	$ $KAFKA_HOME/bin/connect-standalone.sh ~/connect-standalone.properties ~/connect-file-source.properties ~/connect-file-sink.properties
+	
+	Terminal #3:
+	•	Check the contents of the output file test.sink.txt. Exit vi.
+	•	Then, add a line to the input file and see if it appears on the consumer console and also in the output file.
+	$ echo “This is a lined added manually…” >> logfile.txt
+
+
+Kafka with Python:
+
+pip install kafka-python
+python3 -m pip install kafka-python
+
+Simple example:
+Kafka Consumer: (In Python shell):
+from kafka import KafkaConsumer
+consumer = KafkaConsumer('sample')
+for message in consumer:
+    print (message)
+
+Kafka Producer: (In Python shell):
+from kafka import KafkaProducer
+producer = KafkaProducer(bootstrap_servers='localhost:9092')
+producer.send('sample', b'Hello, World!')
+producer.send('sample', key=b'message-two', value=b'This is Kafka-Python')
+
+
+Spark Streaming:
+Extension of the Spark Core API.
+Enables high-throughput, scalable and fault-tolerant stream processing of live data streams.
+Data (input) can be ingested from many diff sources: Kafka, TCP sockets, Kinesis.
+High-level functions: map, reduce, filter, join etc.
+After processing, push data to filesystems, DBs or even live dashboards. ML (SparkMLlib), GraphX too.
+
+Provides a high-level abstraction called Discretized Stream or DStream, which represents a continuous stream of data.
+DStreams can be created either fronm input data streams from sources (kafka, kinesis etc.) or by applying high-level operations on other DStreams.
+Internally, a DStream is represented as a sequence of RDDs.
+Create Spark Streaming programs with DStreams in Scala, Python, Java.
+
+T1:
+nc -lk 9999
+
+T2:
+cd SparkSamples
+$KAFKA_HOME/bin/spark-submit ./network_wordcount.py localhost 9999
+<Type some lines in T2>
+<Words in the lines should appear on T1 along with their count>
+
+Points to remember about Spark Streaming:
+1. Once a context has been started, no new streaming computations cna be steup or added to it.
+2. Once you stop a context, it cannot be restarted.
+3. Only one StreamingContext can be active in a JVM at a time.
+4. stop() on a StreamingContext also stops the SparkContext. To stop only the StreamingContext, set stop() optional param stopSparkContext to False.
+5. Reuse the SparkContext to create multiple StreamingContexts, as long as previous StreamingContext is stopped.
+
+When reading data from a topic, it will have 3 fields:
+	key
+	value: the message that was sent to the topcic.
+	timestamp
+	
+Word count Python program:
+kafka_wordcount.py
+#T1:
+$KAFKA_HOME/bin/kafka-console-producer.sh --broker-list sandbox-hdp.hortonworks.com:6667 --topic test
+
+#T2:
+$KAFKA_HOME/bin/kafka-console-consumer.sh --bootstrap-server sandbox-hdp.hortonworks.com:6667 --topic test --from-beginning
+
+#T3:
+cd SparkSamples
+spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8-assembly_2.11:2.4.4 kafka_wordcount.py  localhost:2181 test
+
+Structured Streaming:
+(not working on Hortonworks HDP as it requires kafka-python libraries and "pip" does not exist and cannot be installed on the HDP)
+
+Demo – Orders Data:
+T#1:
+su - hdoop
+ssh localhost
+cd $HADOOP_HOME/sbin
+start-dfs.sh
+start-yarn.sh
+python3 -m pip install kafka-python
+OR 
+pip install kafka-python
+cd $KAFKA_HOME
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+T#2:
+su - hdoop
+cd $KAFKA_HOME
+bin/kafka-server-start.sh config/server.properties
+
+T#3:
+su - hdoop
+cd $KAFKA_HOME
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test-topic
+
+T#4:
+su - hdoop
+cd $KAFKA_HOME
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+
+T#5:
+su - hdoop
+cd SparkSamples/OrderData
+mkdir /tmp/spark-events
+spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8-assembly_2.11:2.4.4 kafka_streaming_json_demo.py
+
+OR
+
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 kafka_streaming_json_demo.py
+
+T#3:
+cd SparkSamples/OrderData
+python3 kafka_producer.py
+
+Demo – Transaction Data:
+T#1:
+su - hdoop
+ssh localhost
+cd $HADOOP_HOME/sbin
+start-dfs.sh
+start-yarn.sh
+cd $KAFKA_HOME
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+T#2:
+su - hdoop
+cd $KAFKA_HOME
+bin/kafka-server-start.sh config/server.properties
+
+T#3:
+su - hdoop
+cd $KAFKA_HOME
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test-topic
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic outputtopic
+
+T#4:
+su - hdoop
+cd $KAFKA_HOME
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+
+T#5:
+su - hdoop
+cd $KAFKA_HOME
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic outputtopic --from-beginning
+
+T#6:
+su - hdoop
+cd SparkSamples/TransactionData
+mkdir /tmp/spark-events
+spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8-assembly_2.11:2.4.4 pyspark_structured_streaming_kafka_demo.py
+
+OR
+
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 pyspark_structured_streaming_kafka_demo.py
+
+T#3:
+cd SparkSamples/TransactionData
+python3 cloudtv_kafka_producer_demo.py
+
+Demo – Orders Data – AVRO:
+All steps remain the same, except running the producer and streaming (consumer) programs:
+# New Terminal:
+su - hdoop
+cd SparkSamples/OrderData
+mkdir /tmp/spark-events
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2,org.apache.spark:spark-avro_2.12:3.1.2 kafka_streaming_avro_demo.py
+
+# New Terminal:
+cd SparkSamples/OrderData
+python3 kafka_producer_avro.py  
+
+Demo – Orders Data - CSV:
+All steps remain the same, except running the producer and streaming (consumer) programs:
+# New Terminal:
+su - hdoop
+cd SparkSamples/OrderData
+mkdir /tmp/spark-events
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2,org.apache.spark:spark-avro_2.12:3.1.2 kafka_streaming_csv_demo.py
+
+# New Terminal:
+cd SparkSamples/OrderData
+python3 kafka_producer_csv.py  
